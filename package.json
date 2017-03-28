@@ -1,0 +1,12 @@
+{
+  "name": "license-checker",
+  "version": "1.0.3",
+  "bin": {
+    "generateLicense": "generate.js"
+  },
+  "main":"crypto.js",
+  "author": "Ronyang <yrong1997@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+  }
+}
