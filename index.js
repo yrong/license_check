@@ -41,5 +41,18 @@ if(encryption_algorithm === 'rsa'){
     decrypt = decrypt_aes
 }
 
+let initialized = false
+var load = (license_file_path)=>{
+    if(!initialized){
+        try{
+            return decrypt(fs.readFileSync(license_file_path, "utf8"))
+            initialized = true
+        }catch(error){
+            console.log('license file invalid,please contact administrator')
+            process.exit(-1)
+        }
+    }
+}
 
-module.exports = {encrypt,decrypt}
+
+module.exports = {encrypt,decrypt,load}
