@@ -1,12 +1,14 @@
 {
   "name": "cmdb-license-checker",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "bin": {
     "generateLicense": "generate.js"
   },
-  "main":"index.js",
+  "main": "index.js",
   "author": "Ronyang <yrong1997@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "moment": "^2.18.1",
+    "sntp": "^2.0.2"
   }
 }

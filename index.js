@@ -1,6 +1,8 @@
 var crypto = require("crypto");
 var path = require("path");
 var fs = require("fs");
+var moment = require('moment');
+var sntp = require('sntp');
 
 var encrypt_rsa = function(text) {
     var publicKey = fs.readFileSync(path.resolve(__dirname,'./key.pub'), "utf8");
@@ -41,18 +43,33 @@ if(encryption_algorithm === 'rsa'){
     decrypt = decrypt_aes
 }
 
-let initialized = false
+let initialized = false,license
+
 var load = (license_file_path)=>{
     if(!initialized){
         try{
-            return decrypt(fs.readFileSync(license_file_path, "utf8"))
+            license = decrypt(fs.readFileSync(license_file_path, "utf8"))
             initialized = true
+            license = JSON.parse(license)
         }catch(error){
-            console.log('license file invalid,please contact administrator')
+            console.log('license invalid,please contact administrator')
             process.exit(-1)
         }
+        if(license&&license.expiration){
+            let expiration_date = moment(license.expiration),now = moment();
+            sntp.start(function () {
+                now = moment(sntp.now())
+                if(expiration_date.isBefore(now)){
+                    console.log('license expired,please contact administrator')
+                    process.exit(-1)
+                }
+            });
+        }
+        return license
     }
 }
+var now = ()=>{return moment(sntp.now())}
 
+var getLicense = ()=>{return license}
 
-module.exports = {encrypt,decrypt,load}
+module.exports = {encrypt,decrypt,load,now,getLicense}
