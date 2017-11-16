@@ -1,5 +1,5 @@
 {
-  "name": "cmdb-license-checker",
+  "name": "license-helper",
   "version": "1.0.4",
   "bin": {
     "generateLicense": "generate.js"
