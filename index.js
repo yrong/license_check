@@ -1,24 +1,24 @@
-var crypto = require("crypto");
-var path = require("path");
-var fs = require("fs");
-var moment = require('moment');
-var sntp = require('sntp');
+const crypto = require("crypto")
+const path = require("path")
+const fs = require("fs")
+const moment = require('moment')
+const sntp = require('sntp')
 
-var encrypt_rsa = function(text) {
+const encrypt_rsa = function(text) {
     var publicKey = fs.readFileSync(path.resolve(__dirname,'./key.pub'), "utf8");
     var buffer = new Buffer(text);
     var encrypted = crypto.publicEncrypt(publicKey, buffer);
     return encrypted.toString("base64");
-};
+}
 
-var decrypt_rsa = function(text) {
+const decrypt_rsa = function(text) {
     var privateKey = fs.readFileSync(path.resolve(__dirname,'./key'), "utf8");
     var buffer = new Buffer(text, "base64");
     var decrypted = crypto.privateDecrypt(privateKey, buffer);
     return decrypted.toString("utf8");
-};
+}
 
-var  algorithm = 'aes-256-ctr', password = 'd6F3Efeq';
+const  algorithm = 'aes-256-ctr', password = 'd6F3Efeq';
 
 function encrypt_aes(text){
     var cipher = crypto.createCipher(algorithm,password)
@@ -45,7 +45,7 @@ if(encryption_algorithm === 'rsa'){
 
 let initialized = false,license
 
-var load = (license_file_path)=>{
+const load = (license_file_path)=>{
     if(!initialized){
         try{
             license = decrypt(fs.readFileSync(license_file_path, "utf8"))
@@ -68,8 +68,20 @@ var load = (license_file_path)=>{
         return license
     }
 }
-var now = ()=>{return moment(sntp.now())}
 
-var getLicense = ()=>{return license}
+const now = ()=>{return moment(sntp.now())}
 
-module.exports = {encrypt,decrypt,load,now,getLicense}
+const getLicense = ()=>{return license}
+
+const license_middleware= async (ctx, next) => {
+    let license = getLicense()
+    let expiration_date = moment(license.expiration),current = now()
+    if(expiration_date.isBefore(current)){
+        console.log('license expired,please contact administrator')
+        process.exit(-1)
+    }
+    ctx.state.license = license
+    await next();
+}
+
+module.exports = {encrypt,decrypt,load,now,getLicense,license_middleware}
