@@ -43,35 +43,31 @@ if(encryption_algorithm === 'rsa'){
     decrypt = decrypt_aes
 }
 
-let initialized = false,license
 
 const load = (license_file_path)=>{
-    if(!initialized){
-        try{
-            license = decrypt(fs.readFileSync(license_file_path, "utf8"))
-            initialized = true
-            license = JSON.parse(license)
-        }catch(error){
-            console.log('license invalid,please contact administrator')
-            process.exit(-1)
-        }
-        if(license&&license.expiration){
-            let expiration_date = moment(license.expiration),now = moment();
-            sntp.start(function () {
-                now = moment(sntp.now())
-                if(expiration_date.isBefore(now)){
-                    console.log('license expired,please contact administrator')
-                    process.exit(-1)
-                }
-            });
-        }
-        return license
+    let scirichon_license
+    try{
+        scirichon_license = global._scirichon_license = JSON.parse(decrypt(fs.readFileSync(license_file_path, "utf8")))
+    }catch(error){
+        console.log('license invalid,please contact administrator')
+        process.exit(-1)
     }
+    if(scirichon_license&&scirichon_license.expiration){
+        let expiration_date = moment(scirichon_license.expiration),now = moment();
+        sntp.start(function () {
+            now = moment(sntp.now())
+            if(expiration_date.isBefore(now)){
+                console.log('license expired,please contact administrator')
+                process.exit(-1)
+            }
+        });
+    }
+    return scirichon_license
 }
 
 const now = ()=>{return moment(sntp.now())}
 
-const getLicense = ()=>{return license}
+const getLicense = ()=>{return global._scirichon_license}
 
 const license_middleware= async (ctx, next) => {
     let license = getLicense()

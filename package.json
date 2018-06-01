@@ -1,6 +1,6 @@
 {
   "name": "license-helper",
-  "version": "1.0.4-beta.1",
+  "version": "1.0.4-beta.2",
   "bin": {
     "generateLicense": "generate.js"
   },
