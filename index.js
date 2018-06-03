@@ -44,8 +44,8 @@ if(encryption_algorithm === 'rsa'){
 }
 
 
-const load = (license_file_path)=>{
-    let scirichon_license
+const load = (option)=>{
+    let scirichon_license,license_file_path = option.path
     try{
         scirichon_license = global._scirichon_license = JSON.parse(decrypt(fs.readFileSync(license_file_path, "utf8")))
     }catch(error){
@@ -69,15 +69,17 @@ const now = ()=>{return moment(sntp.now())}
 
 const getLicense = ()=>{return global._scirichon_license}
 
-const license_middleware= async (ctx, next) => {
-    let license = getLicense()
-    let expiration_date = moment(license.expiration),current = now()
-    if(expiration_date.isBefore(current)){
-        console.log('license expired,please contact administrator')
-        process.exit(-1)
+const license_middleware = (option) => {
+    return async (ctx, next) => {
+        let license = getLicense()
+        let expiration_date = moment(license.expiration), current = now()
+        if (expiration_date.isBefore(current)) {
+            console.log('license expired,please contact administrator')
+            process.exit(-1)
+        }
+        ctx.state.license = license
+        await next();
     }
-    ctx.state.license = license
-    await next();
 }
 
 module.exports = {encrypt,decrypt,load,now,getLicense,license_middleware}
