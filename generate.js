@@ -1,17 +1,7 @@
 #!/usr/bin/env node
 
-const crypto = require('./index')
-const path = require('path')
-const fs = require('fs')
+const license_helper = require('./index')
 
-let generateLicense = function() {
-    let result = crypto.encrypt(fs.readFileSync(path.resolve('./license.json'), 'utf8'))
-    let licenseFilePath = process.env.LICENSE_PATH + '/' + process.env.NODE_NAME + '.lic'
-    fs.writeFileSync(licenseFilePath,result)
-    console.log('license file generated in:'+licenseFilePath)
-    return result
-}
 
-generateLicense()
+license_helper.generateLicense(process.env.LICENSE_PATH||'.',process.env.NODE_NAME||'node')
 
-module.exports = generateLicense

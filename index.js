@@ -82,4 +82,12 @@ const license_middleware = (option) => {
     }
 }
 
-module.exports = {encrypt,decrypt,load,now,getLicense,license_middleware}
+const generateLicense = function(dirPath,fileName) {
+    let result = encrypt(fs.readFileSync(path.resolve('./license.json'), 'utf8'))
+    let licenseFilePath = `${dirPath}/${fileName}.lic`
+    fs.writeFileSync(licenseFilePath,result)
+    console.log('license file generated in:'+licenseFilePath)
+    return result
+}
+
+module.exports = {encrypt,decrypt,load,now,getLicense,license_middleware,generateLicense}

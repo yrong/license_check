@@ -1,14 +1,21 @@
 {
   "name": "license-helper",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "bin": {
     "generateLicense": "generate.js"
+  },
+  "scripts": {
+    "test": "mocha test.js --reporter spec"
   },
   "main": "index.js",
   "author": "Ronyang <yrong1997@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.18.1",
-    "sntp": "^2.0.2"
+    "moment": "^2.24.0",
+    "sntp": "^3.0.2"
+  },
+  "devDependencies": {
+    "mocha": "^3.4.1",
+    "should": "^13.1.3"
   }
 }
