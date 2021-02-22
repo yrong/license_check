@@ -2,7 +2,7 @@ const crypto = require("crypto")
 const path = require("path")
 const fs = require("fs")
 const moment = require('moment')
-const sntp = require('sntp')
+const sntp = require('@hapi/sntp')
 
 const encrypt_rsa = function(text) {
     var publicKey = fs.readFileSync(path.resolve(__dirname,'./key.pub'), "utf8");
@@ -44,24 +44,28 @@ if(encryption_algorithm === 'rsa'){
 }
 
 
-const load = (option)=>{
-    let scirichon_license,license_file_path = option.path
+const load = async (option)=>{
+    let scirichon_license,license_file_path = option.path,ntp_server=option.ntpServer||"cn.ntp.org.cn"
     try{
         scirichon_license = global._scirichon_license = JSON.parse(decrypt(fs.readFileSync(license_file_path, "utf8")))
     }catch(error){
         console.log('license invalid,please contact administrator')
         process.exit(-1)
     }
-    if(scirichon_license&&scirichon_license.expiration){
-        let expiration_date = moment(scirichon_license.expiration),now = moment();
-        sntp.start(function () {
-            now = moment(sntp.now())
-            if(expiration_date.isBefore(now)){
-                console.log('license expired,please contact administrator')
-                process.exit(-1)
-            }
-        });
+    if(scirichon_license&&scirichon_license.expiration) {
+        let expiration_date = moment(scirichon_license.expiration), now = moment();
+        try {
+            let currentTime = await sntp.time({host: ntp_server, resolveReference: true});
+            now = moment(currentTime.originateTimestamp)
+        } catch (error) {
+            console.log('check license from ntp failed:' + error.message)
+        }
+        if (expiration_date.isBefore(now)) {
+            console.log('license expired,please contact administrator')
+            process.exit(-1)
+        }
     }
+
     return scirichon_license
 }
 

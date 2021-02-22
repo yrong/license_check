@@ -1,6 +1,6 @@
 {
   "name": "license-helper",
-  "version": "1.0.7",
+  "version": "1.0.7-beta.1",
   "bin": {
     "generateLicense": "generate.js"
   },
@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "moment": "^2.24.0",
-    "sntp": "^3.0.2"
+    "@hapi/sntp": "^4.0.0"
   },
   "devDependencies": {
     "mocha": "^3.4.1",
