@@ -1,6 +1,6 @@
 {
   "name": "license-helper",
-  "version": "1.0.7-beta.1",
+  "version": "1.0.7-beta.2",
   "bin": {
     "generateLicense": "generate.js"
   },
@@ -11,8 +11,8 @@
   "author": "Ronyang <yrong1997@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.24.0",
-    "@hapi/sntp": "^4.0.0"
+    "moment": "^2.29.1",
+    "@hapi/sntp": "4.0.0"
   },
   "devDependencies": {
     "mocha": "^3.4.1",
