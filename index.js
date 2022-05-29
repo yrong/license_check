@@ -45,27 +45,32 @@ if(encryption_algorithm === 'rsa'){
 
 
 const load = async (option)=>{
-    let scirichon_license,license_file_path = option.path,ntp_server=option.ntpServer||"cn.ntp.org.cn"
+    let scirichon_license,license_file_path = option.path,license_content = option.content,
+        apply = option.apply,ntp_server=option.ntpServer||"pool.ntp.org",timeout = option.timeout
     try{
-        scirichon_license = global._scirichon_license = JSON.parse(decrypt(fs.readFileSync(license_file_path, "utf8")))
+        license_content = license_content || fs.readFileSync(license_file_path, "utf8")
+        scirichon_license = JSON.parse(decrypt(license_content))
     }catch(error){
-        console.log('license invalid,please contact administrator')
-        process.exit(-1)
+        throw new Error('license invalid,please contact administrator')
     }
     if(scirichon_license&&scirichon_license.expiration) {
-        let expiration_date = moment(scirichon_license.expiration), now = moment();
+        let expiration_date = moment(scirichon_license.expiration),now;
         try {
-            let currentTime = await sntp.time({host: ntp_server, resolveReference: true});
+            let currentTime = await sntp.time({host: ntp_server, resolveReference: true,timeout: timeout||2500});
             now = moment(currentTime.originateTimestamp)
         } catch (error) {
             console.log('check license from ntp failed:' + error.message)
+            now = moment()
         }
-        if (expiration_date.isBefore(now)) {
-            console.log('license expired,please contact administrator')
-            process.exit(-1)
+        if(apply){
+            if (expiration_date.isBefore(now)) {
+                console.log('license expired,please contact administrator')
+                process.exit(-1)
+            }
+            global._scirichon_license = scirichon_license
         }
-    }
 
+    }
     return scirichon_license
 }
 
